@@ -68,10 +68,12 @@ impl ConsumerGroupDescription {
     ) -> ConsumerGroupDescriptionResult {
         let group_id = cstr_to_owned(rdsys::rd_kafka_ConsumerGroupDescription_group_id(ptr));
 
-        let kafka_error =
-            RDKafkaError::from_ptr(rdsys::rd_kafka_ConsumerGroupDescription_error(ptr) as *mut _);
-        if kafka_error.is_error() {
-            Err((group_id.clone(),KafkaError::AdminOp(kafka_error.code())))
+        // Read error code without taking ownership — the error object is owned
+        // by the C-level ConsumerGroupDescription and freed with the event.
+        let error_ptr = rdsys::rd_kafka_ConsumerGroupDescription_error(ptr);
+        let error_code = rdsys::rd_kafka_error_code(error_ptr);
+        if error_code.is_error() {
+            Err((group_id.clone(), KafkaError::AdminOp(error_code)))
         } else {
             let is_simple_consumer_group: bool =
                 rdsys::rd_kafka_ConsumerGroupDescription_is_simple_consumer_group(ptr) != 0;
