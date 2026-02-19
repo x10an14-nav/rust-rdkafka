@@ -73,7 +73,7 @@ impl ConsumerGroupDescription {
         let error_ptr = rdsys::rd_kafka_ConsumerGroupDescription_error(ptr);
         let error_code = rdsys::rd_kafka_error_code(error_ptr);
         if error_code.is_error() {
-            Err((group_id.clone(), KafkaError::AdminOp(error_code)))
+            Err((group_id.clone(), KafkaError::AdminOp(error_code.into())))
         } else {
             let is_simple_consumer_group: bool =
                 rdsys::rd_kafka_ConsumerGroupDescription_is_simple_consumer_group(ptr) != 0;
