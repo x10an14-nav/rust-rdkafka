@@ -1570,7 +1570,8 @@ impl Future for ListConsumerGroupOffsetsFuture {
         }
 
         let mut n = 0;
-        let groups = unsafe { rdsys::rd_kafka_DeleteGroups_result_groups(res, &mut n) };
+        let groups =
+            unsafe { rdsys::rd_kafka_ListConsumerGroupOffsets_result_groups(res, &mut n) };
         Poll::Ready(Ok(ConsumerGroup::vec_result_from_ptr(groups, n)))
     }
 }
